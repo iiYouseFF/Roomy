@@ -1,28 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:roomy/screens/room_chat_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Roompage extends StatefulWidget {
-  String challangeName;
-  Roompage({super.key, required this.challangeName});
-
   @override
   State<Roompage> createState() => _RoompageState();
 }
 
 class _RoompageState extends State<Roompage> {
+  final supabase = Supabase.instance.client;
+  Map<String, dynamic> _roomData = {};
+
+  
+  @override
+  void initState() {
+    super.initState();
+    getRoomData();
+  }
+
+  
+
+
+  Future<void> getRoomData() async {
+    final prefs = await SharedPreferences.getInstance();
+    String roomCode = prefs.getString('roomCode') ?? '';
+    try {
+      final response = await Supabase.instance.client
+          .from('Rooms')
+          .select()
+          .eq('room_code', roomCode)
+          .single();
+
+      setState(() {
+        _roomData = response;
+      });
+    } catch (e) {
+      print('Error fetching room data: $e');
+      setState(() {
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.large(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RoomChatScreen()),
+          );
+        },
         shape: CircleBorder(),
 
         backgroundColor: Colors.blue,
-        onPressed: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (context) => RoomScreen()));
-        },
         child: Icon(Icons.chat_bubble, color: Colors.white),
       ),
       backgroundColor: Colors.white,
@@ -39,8 +73,9 @@ class _RoompageState extends State<Roompage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Titles(titel: widget.challangeName, font: "bold"),
-          Titles(titel: "Challenge", font: "normal"),
+          Titles(titel: "${_roomData['room_name']}", font: "bold"),
+          Titles(titel: "${_roomData['Task']}", font: "normal"),
+          Titles(titel: "${_roomData['room_code']}", font: "normal"),
           SizedBox(height: 20),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -141,6 +176,7 @@ class _RoompageState extends State<Roompage> {
               ),
             ],
           ),
+          SizedBox(height: 40),
         ],
       ),
     );

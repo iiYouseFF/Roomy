@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:project/Roompage.dart';
+import 'package:roomy/screens/room_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:roomy/widgets/custom_button.dart';
 
 class Joinroom extends StatefulWidget {
   const Joinroom({super.key});
@@ -13,6 +16,43 @@ class Joinroom extends StatefulWidget {
 
 class _JoinroomState extends State<Joinroom> {
   TextEditingController controller = TextEditingController();
+  final supabase = Supabase.instance.client;
+
+  Future<void> joinRoom(String roomCode) async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userId');
+  final userName = prefs.getString('userName');
+
+  if (userId == null || userName == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("User not logged in")),
+    );
+    return;
+  }
+
+  final room = await supabase
+      .from('Rooms')
+      .select()
+      .eq('room_code', roomCode)
+      .maybeSingle();
+
+  if (room == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Room not found")),
+    );
+    return;
+  }
+  await supabase.from('RoomMembers').insert({
+    'room_id': room['room_id'],
+    'user_id': userId,
+    'user_name': userName,
+  });
+
+  Navigator.of(context).push(
+    MaterialPageRoute(builder: (context) => Roompage()),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,17 +84,16 @@ class _JoinroomState extends State<Joinroom> {
             style: GoogleFonts.poppins(color: Colors.grey),
           ),
           SizedBox(height: 12),
-          Pincode(context, controller),
+          pincode(context, controller),
           SizedBox(height: 2),
-          Joinbutton(context),
+          CustomButton(text: 'Join!', onPressed: () => joinRoom(controller.text), backgroundColor:const Color(0xff1E88E5) , textColor: Colors.white, width: 500)
         ],
       ),
     );
   }
 }
 
-Widget Pincode(BuildContext context, TextEditingController controller) {
-  String currentPin = "";
+Widget pincode(BuildContext context, TextEditingController controller) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -86,40 +125,10 @@ Widget Pincode(BuildContext context, TextEditingController controller) {
 
             borderRadius: BorderRadius.circular(12),
           ),
-          onChanged: ((value) {
-            currentPin = value;
-          }),
-          onCompleted: (value) {
-            ///////////////////////////////////////
-            //هنا لازم تعمل طريقة للفاليديشن عشان هو حتي لو محطتش الكود بيدخل
-          },
         ),
       ),
     ],
   );
 }
 
-//open me --في مشكلة جوا
-Widget Joinbutton(BuildContext context) {
-  return Container(
-    margin: EdgeInsets.symmetric(horizontal: 24),
-    child: MaterialButton(
-      color: Colors.blue,
-      height: 52,
-      minWidth: 355,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(26),
-      ),
-      onPressed: () {
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => Roompage()));
-      },
-      child: Text(
-        "Join!",
-        textAlign: TextAlign.center,
-        style: GoogleFonts.poppins(color: Colors.white, fontSize: 28),
-      ),
-    ),
-  );
-}
+

@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart'; 
-void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: RoomChatScreen(),
-    );
-  }
-}
 
 class RoomChatScreen extends StatelessWidget {
   const RoomChatScreen({super.key});
@@ -21,7 +7,7 @@ class RoomChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(white),
+      backgroundColor: const Color(0xFFFFFFFF),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

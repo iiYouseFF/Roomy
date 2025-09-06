@@ -1,20 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: UserProfileScreen(),
-    );
-  }
-}
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
@@ -22,7 +7,7 @@ class UserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(black), 
+      backgroundColor: const Color(0xFFFFFFFF), 
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
         child: Column(
@@ -78,12 +63,6 @@ class UserProfileScreen extends StatelessWidget {
                           color: Colors.black54,
                         ),
                       ),
-                      const SizedBox(width: 5),
-                      Icon(
-                        Icons.edit,
-                        size: 16,
-                        color: Colors.black.withOpacity(0.6),
-                      ),
                     ],
                   ),
                 ],
@@ -120,3 +99,10 @@ class UserProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

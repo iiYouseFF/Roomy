@@ -32,7 +32,7 @@ class CustomChallengeCard extends StatelessWidget {
           SizedBox(height: 10,),
           CustomText(text: description , fontSize: 28, fontWeight: FontWeight.w500,),
           SizedBox(height: 10,),
-          CustomButton(text: buttonTitle, onPressed: (){}, backgroundColor: const Color(0xff1E88E5), textColor: Colors.white, width: 400)
+          CustomButton(text: buttonTitle, onPressed: onTap, backgroundColor: const Color(0xff1E88E5), textColor: Colors.white, width: 400)
         ],
       ),
     );
